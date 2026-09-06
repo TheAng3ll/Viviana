@@ -18,8 +18,8 @@ const SECTIONS = [
   {
     title: "De dónde venía",
     paragraphs: [
-      "Nació en Guadalajara en 1996, el menor de dos hermanos, y creció en una casa donde siempre había alguien cocinando. De niño era el que se quedaba callado en las fiestas y luego, ya que se iba la gente, contaba todo lo que había visto con un detalle que daba risa.",
-      "Estudió lo que quiso, cambió de opinión dos veces, y acabó dedicándose a algo que ni él esperaba y que terminó gustándole muchísimo.",
+      "Nacio en un rinconcito de los altos de Jalisco, el de enmedio de 3 hermanos, donde siempre había alguien cocinando. Desde niño era creativo le encantaba crear cosas nuevas, vestir diferente y ser único en lo que hacía.",
+      "Viajo lo que quiso y hasta donde le alcanzó tenía muchos lugares aún por visitar pero estoy segura que desde el plano espiritual está viajando sin barreras.",
     ],
   },
   {

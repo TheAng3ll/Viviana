@@ -14,8 +14,12 @@ export const site = {
   /** Descripción para buscadores y para cuando se comparte el enlace. */
   description:
     "Un lugar tranquilo para recordar a Iván: sus viajes, sus fotos y las historias de quienes lo quisieron.",
-  /** Cambia esto por el dominio real antes de subir a producción. */
-  url: "https://ejemplo.com",
+  /**
+   * Dominio del sitio. Sirve para armar las direcciones absolutas de la vista
+   * previa cuando alguien comparte el enlace por WhatsApp o Facebook.
+   * En el servidor se puede sobreescribir con la variable SITE_URL.
+   */
+  url: "https://ivanbf.com.mx",
 } as const;
 
 export const nav = [

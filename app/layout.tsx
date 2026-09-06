@@ -22,7 +22,7 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
+  metadataBase: new URL(process.env.SITE_URL ?? site.url),
   title: {
     default: `${site.fullName} · ${site.years}`,
     template: `%s · ${site.name}`,
