@@ -3,7 +3,8 @@ import { HeroSky } from "@/components/hero-sky";
 import { Photo } from "@/components/photo";
 import { PostCard } from "@/components/post-card";
 import { Reveal } from "@/components/reveal";
-import { allPhotos, postsByDate } from "@/content/posts";
+import { photo } from "@/content/photos";
+import { allPhotos, orderedPosts } from "@/content/posts";
 import { site } from "@/content/site";
 
 /* Texto de muestra. Cámbialo por lo que quieras contar de él. */
@@ -15,8 +16,31 @@ const BIO = [
   "Le gustaban los amaneceres más que los atardeceres, el café sin azúcar, y las carreteras vacías. No era de muchas palabras, pero cuando hablaba valía la pena poner atención.",
 ];
 
-const featured = postsByDate.slice(0, 3);
-const mosaic = allPhotos.slice(0, 4);
+const featured = orderedPosts.slice(0, 3);
+
+/* El retrato de la sección «Quién era». */
+const PORTRAIT = photo(
+  "casa-retrato",
+  "Iván de perfil, con camisa blanca abierta y lentes oscuros colgados del cuello, frente a una pared de tabique"
+);
+
+/*
+  Fotos del mosaico de la portada, por nombre de archivo. Se mezclan
+  verticales y horizontales a propósito; el muro las acomoda por columnas.
+*/
+const MOSAIC_IDS = [
+  "colombia-letras",
+  "alteno-gradas",
+  "guanajuato-escalera",
+  "casa-dibujando",
+  "agua-flamencos",
+  "paseo-alebrije",
+  "casa-chamarra",
+  "colombia-sombrillas",
+];
+const mosaic = MOSAIC_IDS.map(
+  (id) => allPhotos.find((item) => item.src === `/img/${id}.jpg`)!
+);
 
 export default function HomePage() {
   return (
@@ -67,11 +91,8 @@ export default function HomePage() {
         <div className="shell grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-8">
           <Reveal className="lg:col-span-5">
             <Photo
-              photo={{
-                src: "/img/retrato.svg",
-                alt: "Retrato de Iván, de pie contra una pared iluminada",
-              }}
-              ratio="portrait"
+              photo={PORTRAIT}
+              maxHeight="80vh"
               sizes="(max-width: 1024px) 100vw, 40vw"
             />
           </Reveal>
@@ -111,7 +132,7 @@ export default function HomePage() {
             href="/historias"
             className="font-meta link-quiet text-[0.75rem] tracking-[0.2em] text-ink-soft uppercase"
           >
-            Ver todas ({postsByDate.length})
+            Ver todas ({orderedPosts.length})
           </Link>
         </Reveal>
 
@@ -133,14 +154,20 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={150}>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-              {mosaic.map((photo, index) => (
-                <Photo
-                  key={`${photo.src}-${index}`}
-                  photo={photo}
-                  ratio="portrait"
-                  sizes="(max-width: 640px) 50vw, 25vw"
-                />
+            <div className="columns-2 gap-3 sm:gap-4 lg:columns-4">
+              {mosaic.map((item) => (
+                <Link
+                  key={item.src}
+                  href={`/historias/${item.postSlug}`}
+                  className="group mb-3 block break-inside-avoid sm:mb-4"
+                  aria-label={item.postTitle}
+                >
+                  <Photo
+                    photo={item}
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                    imageClassName="transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:scale-[1.05]"
+                  />
+                </Link>
               ))}
             </div>
           </Reveal>
@@ -168,7 +195,7 @@ export default function HomePage() {
             que te acuerdes, por chiquito que sea.
           </p>
           <Link
-            href={`/historias/${postsByDate[0]!.slug}#recuerdos`}
+            href={`/historias/${orderedPosts[0]!.slug}#recuerdos`}
             className="button"
           >
             Dejar un recuerdo

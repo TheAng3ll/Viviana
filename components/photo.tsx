@@ -1,10 +1,27 @@
 import Image from "next/image";
-import type { Photo as PhotoData } from "@/content/posts";
+import type { CSSProperties } from "react";
+import { aspectOf, type Photo as PhotoData } from "@/content/photos";
+
+type Ratio = "wide" | "landscape" | "square" | "portrait" | "tall";
 
 type PhotoProps = {
   photo: PhotoData;
-  /** Proporción del marco. Las fotos se recortan para llenarlo. */
-  ratio?: "wide" | "landscape" | "square" | "portrait" | "tall";
+  /**
+   * Marco de proporción fija. Si se omite, la foto se muestra en su proporción
+   * real, sin recortes: una vertical se ve vertical y una horizontal, horizontal.
+   */
+  ratio?: Ratio;
+  /**
+   * Sólo con proporción real. Límites [mínimo, máximo] de ancho÷alto. Una foto
+   * fuera de ellos se recorta lo justo para entrar; sirve en tarjetas, donde
+   * una foto de celular a lo alto rompería la fila.
+   */
+  clamp?: [number, number];
+  /**
+   * Sólo con proporción real. Alto máximo del marco (p. ej. "85vh"). Las fotos
+   * que lo rebasen se encogen y se centran en lugar de volverse una tira.
+   */
+  maxHeight?: string;
   /** Anchos que ocupará la imagen, para que el navegador pida el tamaño justo. */
   sizes?: string;
   /** Sólo para la imagen principal de la página: la carga sin esperar. */
@@ -16,34 +33,53 @@ type PhotoProps = {
   showCaption?: boolean;
 };
 
-const RATIOS = {
+const RATIOS: Record<Ratio, string> = {
   wide: "aspect-[21/9]",
   landscape: "aspect-[16/10]",
   square: "aspect-square",
   portrait: "aspect-[4/5]",
   tall: "aspect-[3/4]",
-} as const;
+};
 
 /**
  * Marco de foto del sitio.
  *
- * Las imágenes de muestra son SVG y se sirven tal cual (`unoptimized`): el
- * optimizador de Next no procesa SVG. Cuando se reemplacen por fotos reales
- * en JPG o WebP, la condición deja de aplicar y se optimizan solas, sin
- * tocar este archivo.
+ * Las fotos reales son JPG y Next las optimiza. Los SVG de muestra que quedan
+ * en `public/img` se sirven tal cual, porque el optimizador no los procesa.
  */
 export function Photo({
   photo,
-  ratio = "landscape",
+  ratio,
+  clamp,
+  maxHeight,
   sizes = "(max-width: 768px) 100vw, 50vw",
   priority = false,
   className,
   imageClassName,
   showCaption = false,
 }: PhotoProps) {
+  let frameClass = "";
+  const frameStyle: CSSProperties = {};
+  const outerStyle: CSSProperties = {};
+
+  if (ratio) {
+    frameClass = RATIOS[ratio];
+  } else {
+    let aspect = aspectOf(photo);
+    if (clamp) aspect = Math.min(Math.max(aspect, clamp[0]), clamp[1]);
+    frameStyle.aspectRatio = `${aspect}`;
+
+    if (maxHeight) {
+      // Ancho que cabe en el alto máximo; si es menos que el disponible, se centra.
+      outerStyle.width = `min(100%, calc(${maxHeight} * ${aspect}))`;
+      outerStyle.marginInline = "auto";
+    }
+  }
+
   const frame = (
     <div
-      className={`relative overflow-hidden bg-paper-deep ${RATIOS[ratio]} ${className ?? ""}`}
+      className={`relative w-full overflow-hidden bg-paper-deep ${frameClass} ${className ?? ""}`}
+      style={frameStyle}
     >
       <Image
         src={photo.src}
@@ -53,14 +89,17 @@ export function Photo({
         priority={priority}
         unoptimized={photo.src.endsWith(".svg")}
         className={`object-cover ${imageClassName ?? ""}`}
+        style={photo.focus ? { objectPosition: photo.focus } : undefined}
       />
     </div>
   );
 
-  if (!showCaption || !photo.caption) return frame;
+  if (!showCaption || !photo.caption) {
+    return maxHeight ? <div style={outerStyle}>{frame}</div> : frame;
+  }
 
   return (
-    <figure className="space-y-3">
+    <figure className="space-y-3" style={outerStyle}>
       {frame}
       <figcaption className="font-meta text-[0.8125rem] leading-relaxed text-ink-faint">
         {photo.caption}

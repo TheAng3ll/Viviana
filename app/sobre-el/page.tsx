@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Photo } from "@/components/photo";
 import { Reveal } from "@/components/reveal";
+import { photo } from "@/content/photos";
 import { site } from "@/content/site";
 
 export const metadata: Metadata = {
@@ -64,13 +65,12 @@ export default function SobreElPage() {
       <Reveal className="shell mb-20 sm:mb-28">
         <div className="measure-wide">
           <Photo
-            photo={{
-              src: "/img/retrato.svg",
-              alt: "Retrato de Iván, de pie contra una pared iluminada",
-              caption:
-                "Una de las últimas fotos que le tomamos. Se estaba riendo de algo que ya nadie recuerda.",
-            }}
-            ratio="landscape"
+            photo={photo(
+              "casa-retrato",
+              "Iván de perfil, con camisa blanca abierta y lentes oscuros colgados del cuello, frente a una pared de tabique",
+              "De perfil, en una mesa, con la camisa blanca abierta."
+            )}
+            maxHeight="80vh"
             priority
             sizes="(max-width: 768px) 100vw, 46rem"
             showCaption

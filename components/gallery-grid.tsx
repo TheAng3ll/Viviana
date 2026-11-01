@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { aspectOf } from "@/content/photos";
 import type { allPhotos } from "@/content/posts";
 
 type GalleryPhoto = (typeof allPhotos)[number];
@@ -40,8 +41,8 @@ export function GalleryGrid({ photos }: { photos: GalleryPhoto[] }) {
   return (
     <>
       {/*
-        Alturas alternadas: cada tercera foto es vertical. Rompe la retícula
-        lo suficiente para que se lea como un muro de fotos y no como una tabla.
+        Muro en columnas: cada foto va con su proporción real, así que las
+        verticales y las horizontales se acomodan solas y nada se recorta.
       */}
       <div className="columns-2 gap-3 sm:gap-4 lg:columns-3">
         {photos.map((photo, index) => (
@@ -49,12 +50,11 @@ export function GalleryGrid({ photos }: { photos: GalleryPhoto[] }) {
             key={`${photo.src}-${index}`}
             type="button"
             onClick={() => setOpenIndex(index)}
-            className="group mb-3 block w-full cursor-zoom-in sm:mb-4"
+            className="group mb-3 block w-full cursor-zoom-in break-inside-avoid sm:mb-4"
           >
             <span
-              className={`relative block overflow-hidden bg-paper-deep ${
-                index % 3 === 0 ? "aspect-[4/5]" : "aspect-[4/3]"
-              }`}
+              className="relative block w-full overflow-hidden bg-paper-deep"
+              style={{ aspectRatio: `${aspectOf(photo)}` }}
             >
               <Image
                 src={photo.src}

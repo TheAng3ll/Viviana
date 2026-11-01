@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Photo } from "@/components/photo";
 import { Reveal } from "@/components/reveal";
-import { postsByDate } from "@/content/posts";
+import { orderedPosts } from "@/content/posts";
 import { formatMonth } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -26,9 +26,12 @@ export default function HistoriasPage() {
       </header>
 
       <div className="shell space-y-24 sm:space-y-32">
-        {postsByDate.map((post, index) => {
+        {orderedPosts.map((post, index) => {
           // Se alterna el lado de la foto para que la lista no caiga en ritmo.
           const imageRight = index % 2 === 1;
+          const meta = [post.place, post.date ? formatMonth(post.date) : null]
+            .filter(Boolean)
+            .join(" · ");
 
           return (
             <Reveal key={post.slug}>
@@ -41,9 +44,14 @@ export default function HistoriasPage() {
                     imageRight ? "lg:order-2 lg:col-start-6" : ""
                   }`}
                 >
+                  {/*
+                    La portada conserva su forma. Las verticales se encogen
+                    hasta un alto cómodo y se centran en su columna.
+                  */}
                   <Photo
                     photo={post.cover}
-                    ratio="landscape"
+                    clamp={[0.8, 1.6]}
+                    maxHeight="70vh"
                     priority={index === 0}
                     sizes="(max-width: 1024px) 100vw, 58vw"
                     imageClassName="transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:scale-[1.04]"
@@ -55,10 +63,11 @@ export default function HistoriasPage() {
                     imageRight ? "lg:order-1 lg:col-start-1" : "lg:col-start-9"
                   }`}
                 >
-                  <p className="font-meta text-[0.6875rem] tracking-[0.18em] text-ink-faint uppercase">
-                    {post.place ? `${post.place} · ` : ""}
-                    {formatMonth(post.date)}
-                  </p>
+                  {meta && (
+                    <p className="font-meta text-[0.6875rem] tracking-[0.18em] text-ink-faint uppercase">
+                      {meta}
+                    </p>
+                  )}
 
                   <h2 className="heading text-2xl text-ink sm:text-3xl">
                     <Link

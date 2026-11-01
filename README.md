@@ -31,34 +31,36 @@ Todo el texto y las fotos salen de dos archivos. No hace falta tocar el diseño.
 ### Publicar una entrada nueva
 
 1. Guarda las fotos en `public/img/` (por ejemplo `public/img/oaxaca-01.jpg`).
-2. En `content/posts.ts`, copia una de las entradas que ya están y cambia:
+2. En `content/photos.ts`, anota el nombre de cada foto (sin extensión) y sus
+   medidas en píxeles: `"oaxaca-01": [1600, 1200]`. Con eso el sitio sabe si la
+   foto es vertical u horizontal y la muestra entera, sin recortarla.
+3. En `content/posts.ts`, copia una de las entradas que ya están y cambia:
    - `slug`: la parte final de la dirección (`/historias/mi-entrada`). Único, en
      minúsculas, sin acentos ni espacios.
-   - `title`, `date` (formato `AAAA-MM-DD`), `place`, `excerpt`.
+   - `order`: el lugar en la lista (1 es la primera).
+   - `title`, `place`, `excerpt`. La fecha (`date`, formato `AAAA-MM-DD`) es
+     opcional: sólo ponla si la sabes.
    - `body`: un texto por párrafo.
-   - `cover` y `gallery`: la ruta de cada foto y su `alt` (la descripción para
-     quien no puede ver la imagen — escríbela siempre).
-3. Guarda y vuelve a compilar. La entrada aparece sola en la portada, en
+   - `cover` y `gallery`: cada foto va como
+     `photo("oaxaca-01", "descripción para quien no puede verla", "pie de foto")`.
+     La descripción escríbela siempre.
+4. Guarda y vuelve a compilar. La entrada aparece sola en la portada, en
    `/historias` y en `/galeria`, y trae su propio espacio de recuerdos.
 
-### Las fotos de muestra
+### Cómo se acomodan las fotos
 
-Las imágenes de `public/img/*.svg` son paisajes generados, marcadores de
-posición. Se pueden volver a generar con:
+Cada foto se muestra con su propia forma. En la portada de una historia y en
+la galería de cada entrada no se recorta nada: una horizontal ocupa el ancho y
+una vertical se encoge hasta caber en la pantalla y se centra. Dos verticales
+seguidas en una historia van lado a lado, a la misma altura.
 
-```bash
-node scripts/generate-placeholders.mjs
-```
+En las tarjetas (portada y lista de historias) sí hay un pequeño recorte para
+que la fila quede pareja. Si en alguna foto el recorte deja fuera lo importante,
+el cuarto argumento de `photo(...)` ajusta el punto que se conserva, por
+ejemplo `"center 30%"` para subir el encuadre.
 
-Cuando entren las fotos reales (JPG o WebP), Next las optimiza solo: el código
-que las sirve ya distingue entre SVG y foto.
-
-Si el sitio va a tener muchas fotos reales, conviene instalar `sharp` en el
-servidor para que la optimización sea más rápida:
-
-```bash
-npm install sharp
-```
+Las imágenes `public/img/*.svg` eran los marcadores de posición de antes; ya no
+se usan en ninguna página.
 
 ---
 

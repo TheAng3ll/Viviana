@@ -42,3 +42,6 @@ next-env.d.ts
 
 # recuerdos que deja la gente (se generan en el servidor)
 /data
+
+# fotos originales; las que usa el sitio ya están en public/img
+/docs
