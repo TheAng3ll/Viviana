@@ -66,16 +66,18 @@ se usan en ninguna página.
 
 ## Los recuerdos (comentarios)
 
-- Se guardan en `DATA_DIR/comentarios/<slug>.json`, un archivo por entrada.
-- Si no se define `DATA_DIR`, se usa la carpeta `data/` del proyecto.
-- El archivo se escribe primero en un temporal y luego se renombra, para que un
-  corte a medias no lo deje truncado.
-- Los envíos simultáneos se encolan por entrada, así que dos personas comentando
-  al mismo tiempo no se pisan.
+En el servidor se guardan en una base de datos MySQL, en la tabla `recuerdos`.
+La aplicación la crea sola la primera vez que la usa. La conexión viene en la
+variable de entorno `DATABASE_URL`, que el panel de Hostinger escribe al crear
+la base; no hay que copiarla a ningún archivo.
 
-**Para borrar un recuerdo** (por si alguien escribe algo fuera de lugar): abre
-el archivo JSON de esa entrada, quita el bloque `{ ... }` correspondiente,
-guarda y reinicia la aplicación.
+En local, sin `DATABASE_URL`, se guardan en archivos JSON en `data/comentarios/`
+(o en la carpeta que diga `DATA_DIR`), uno por entrada. Así `npm run dev`
+funciona sin base de datos.
+
+**Para borrar un recuerdo** (por si alguien escribe algo fuera de lugar): en el
+panel de Hostinger, abre phpMyAdmin de la base `u146263747_recuerdos`, entra a
+la tabla `recuerdos` y borra la fila. Se deja de ver en la siguiente visita.
 
 ### Contra el spam
 
@@ -98,20 +100,15 @@ Los tres se pueden ajustar en las constantes `LIMITS`, `LINK_PATTERN` y
 2. **Comandos de la aplicación** (son los que ya trae `package.json`):
    - Build: `npm run build`
    - Start: `npm run start`
-3. **Variable de entorno**, en el panel de la aplicación:
+3. **Base de datos**: la base `u146263747_recuerdos` ya está creada y sus
+   datos de conexión (`DATABASE_URL` y `DB_*`) ya están en las variables de
+   entorno de la aplicación. No hay que configurar nada más.
+4. **Respaldos**: desde phpMyAdmin en el panel se puede exportar la tabla
+   `recuerdos` de vez en cuando. Es todo lo que la gente escribió, y no está en
+   ningún otro lado.
 
-   ```
-   DATA_DIR=/home/TU_USUARIO/datos-ivan
-   ```
-
-   Apúntala a una carpeta **fuera** del proyecto. Así los recuerdos sobreviven
-   a cualquier despliegue nuevo. Crea la carpeta antes del primer despliegue.
-4. **Respaldos**: copia esa carpeta de vez en cuando. Es todo lo que la gente
-   escribió, y no está en ningún otro lado.
-
-> El único punto delicado del montaje es ese: los recuerdos viven en el disco
-> del servidor. Si algún día el sitio se mueve a otro hosting, hay que llevarse
-> la carpeta `DATA_DIR` a mano.
+> Si algún día el sitio se mueve a otro hosting, hay que llevarse esa tabla
+> (exportarla e importarla en la base nueva) y definir `DATABASE_URL` allá.
 
 ---
 
